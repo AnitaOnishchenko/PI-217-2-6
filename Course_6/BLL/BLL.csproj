@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dependencies\BusinessLogicModule.cs" />
     <Compile Include="DTO\RoleDto.cs" />
     <Compile Include="DTO\ServiceDto.cs" />
     <Compile Include="DTO\UserDto.cs" />
