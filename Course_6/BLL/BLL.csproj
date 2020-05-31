@@ -60,11 +60,19 @@
     <Compile Include="DTO\RoleDto.cs" />
     <Compile Include="DTO\ServiceDto.cs" />
     <Compile Include="DTO\UserDto.cs" />
+    <Compile Include="Logic\IServiceService.cs" />
+    <Compile Include="Logic\ServiceService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DAL\DAL.csproj">
+      <Project>{bd99a234-cbcd-4d06-8790-5753b25e654d}</Project>
+      <Name>DAL</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
