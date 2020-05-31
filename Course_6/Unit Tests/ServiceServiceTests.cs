@@ -11,7 +11,7 @@ using System;
 namespace Unit_Tests
 {
     /// <summary>
-    /// Tests for <see cref="ServiceService"/>
+    /// Tests fo <see cref="ServiceService"/>
     /// </summary>
     [TestClass]
     public class ServiceServiceTests
@@ -21,6 +21,7 @@ namespace Unit_Tests
         /// Defines properties and methods for agency services
         /// </summary>
         private IServiceService _serviceService;
+        private IUserService _userService;
 
         /// <summary>
         /// Provides a mock implementation of IUnitOfWork
@@ -31,23 +32,26 @@ namespace Unit_Tests
         ///  Provides a mock implementation of IGenericRepository
         /// </summary>
         private Mock<IGenericRepository<Service>> _serviceRepository;
+        private Mock<IGenericRepository<User>> _userRepository;
 
         /// <summary>
-        /// Collection of services
+        /// Collection of services and users
         /// </summary>
         private List<Service> services;
+        private List<User> users;
 
         [TestInitialize]
         public void Initialize()
         {
             _serviceRepository = new Mock<IGenericRepository<Service>>();
+            _userRepository = new Mock<IGenericRepository<User>>();
             var roleRepository = new Mock<IGenericRepository<Role>>();
-            var userRepository = new Mock<IGenericRepository<User>>();
             var agencyContext = new Mock<AgencyContext>();
 
-            _unitOfWork = new Mock<UnitOfWork>(agencyContext.Object, roleRepository.Object, userRepository.Object, _serviceRepository.Object);
+            _unitOfWork = new Mock<UnitOfWork>(agencyContext.Object, roleRepository.Object, _userRepository.Object, _serviceRepository.Object);
 
             _serviceService = new ServiceService(_unitOfWork.Object);
+            _userService = new UserService(_unitOfWork.Object);
         }
 
 
@@ -76,6 +80,31 @@ namespace Unit_Tests
             Assert.AreEqual(3, result.Count);
         }
 
+
+        /// <summary>
+        /// Tests that GetUsers() returns correct number of users
+        /// </summary>
+        [TestMethod]
+        public void GetUsers_ReturnsCorrectNumberOfUsers()
+        {
+            //Arrange
+            users = new List<User>
+            {
+                new User(){Name ="First"},
+                 new User(){Name ="Second"},
+                  new User(){Name ="Third"},
+            };
+
+            _userRepository.Setup(x => x.Get()).Returns(users);
+
+            //Act
+            var result = _userService.GetUsers();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(3, result.Count);
+        }
+
         /// <summary>
         /// Tests that AddService() calls Create() method with specified parameter
         /// </summary>
@@ -90,6 +119,22 @@ namespace Unit_Tests
 
             //Assert
             _serviceRepository.Verify(x => x.Create(It.IsAny<Service>()), Times.Once);
+        }
+
+        /// <summary>
+        /// Tests that AddUser() calls Create() method with specified parameter
+        /// </summary>
+        [TestMethod]
+        public void AddUser_CalledCreateMethod()
+        {
+            //Arrange
+            _userRepository.Setup(x => x.Create(It.IsAny<User>()));
+
+            //Act
+            _userService.AddUser(new UserDto());
+
+            //Assert
+            _userRepository.Verify(x => x.Create(It.IsAny<User>()), Times.Once);
         }
 
         /// <summary>
@@ -129,6 +174,26 @@ namespace Unit_Tests
             Assert.IsNotNull(result);
             Assert.AreEqual(expectedService.ServiceId, result.ServiceId);
             Assert.AreEqual(expectedService.Name, result.Name);
+        }
+
+        /// <summary>
+        /// Tests that GetUserByID() returns correct service
+        /// </summary>
+        [TestMethod]
+        public void GetUserByID_ReturnsCorrectNumberOfUsers()
+        {
+            //Arrange
+            var expectedUser = new User() { UserId = 1, Name = "First" };
+            _userRepository.Setup(x => x.GetOne(It.IsAny<Func<User, bool>>()))
+               .Returns(expectedUser);
+
+            //Act
+            var result = _userService.GetUserByID(1);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expectedUser.UserId, result.UserId);
+            Assert.AreEqual(expectedUser.Name, result.Name);
         }
 
         /// <summary>
